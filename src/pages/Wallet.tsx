@@ -17,13 +17,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { fetchCurrencies } from "@/features/wallet/walletSlice";
+import { addExpense, fetchCurrencies } from "@/features/wallet/walletSlice";
 
 export const Wallet = () => {
   const dispatch = useAppDispatch();
-  const { currencies, loading } = useAppSelector((state) => state.wallet);
+  const { currencies, loading, expenses } = useAppSelector(
+    (state) => state.wallet
+  );
+
+  const [form, setForm] = useState({
+    value: "",
+    description: "",
+    currency: "",
+    tag: "Alimentação",
+    method: "Dinheiro",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!form.value || !form.description || !form.currency) return;
+
+    dispatch(addExpense(form));
+
+    setForm({
+      ...form,
+      value: "",
+      description: "",
+    });
+  };
 
   useEffect(() => {
     dispatch(fetchCurrencies());
@@ -36,39 +66,61 @@ export const Wallet = () => {
       <main className="max-w-6xl mx-auto px-6 mt-8 flex flex-col gap-10">
         <Card className="bg-white shadow-xl rounded-lg">
           <CardContent className="p-6">
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium">
                     Descrição da despesa
                   </label>
-                  <Input placeholder="Ex: Restaurante" />
+                  <Input
+                    placeholder="Ex: Restaurante"
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium">
                     Categoria da despesa
                   </label>
-                  <Select>
+                  <Select
+                    name="tag"
+                    value={form.tag}
+                    onValueChange={(value) => setForm({ ...form, tag: value })}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar categoria" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="alimentacao">Alimentação</SelectItem>
-                      <SelectItem value="lazer">Lazer</SelectItem>
-                      <SelectItem value="trabalho">Trabalho</SelectItem>
-                      <SelectItem value="transporte">Transporte</SelectItem>
+                      <SelectItem value="Alimentação">Alimentação</SelectItem>
+                      <SelectItem value="Lazer">Lazer</SelectItem>
+                      <SelectItem value="Trabalho">Trabalho</SelectItem>
+                      <SelectItem value="Transporte">Transporte</SelectItem>
+                      <SelectItem value="Saúde">Saúde</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Valor</label>
-                  <Input type="number" placeholder="0.00" />
+                  <Input
+                    type="number"
+                    name="value"
+                    placeholder="0.00"
+                    value={form.value}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium">
                     Método de pagamento
                   </label>
-                  <Select>
+                  <Select
+                    name="method"
+                    value={form.method}
+                    onValueChange={(value) =>
+                      setForm({ ...form, method: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar método" />
                     </SelectTrigger>
@@ -88,7 +140,13 @@ export const Wallet = () => {
               <div className="flex flex-col md:flex-row items-center gap-4">
                 <div className="w-full md:w-1/3">
                   <label className="text-sm font-medium">Moeda</label>
-                  <Select>
+                  <Select
+                    name="currency"
+                    value={form.currency}
+                    onValueChange={(value) =>
+                      setForm({ ...form, currency: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar moeda" />
                     </SelectTrigger>
@@ -131,17 +189,23 @@ export const Wallet = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="hover:bg-blue-800/60 transition">
-                <TableCell>Cinema</TableCell>
-                <TableCell>Lazer</TableCell>
-                <TableCell>Dinheiro</TableCell>
-                <TableCell>30.00</TableCell>
-                <TableCell>Dólar</TableCell>
-                <TableCell>5.58</TableCell>
-                <TableCell>167.25</TableCell>
-                <TableCell>Real</TableCell>
-                <TableCell>✏️ 🗑️</TableCell>
-              </TableRow>
+              {expenses.map((exp) => {
+                const rate = Number(exp.exchangeRates[exp.currency].ask);
+                const converted = Number(exp.value) * rate;
+                return (
+                  <TableRow className="hover:bg-blue-800/60 transition">
+                    <TableCell>{exp.description}</TableCell>
+                    <TableCell>{exp.tag}</TableCell>
+                    <TableCell>{exp.method}</TableCell>
+                    <TableCell>{Number(exp.value).toFixed(2)}</TableCell>
+                    <TableCell>{exp.currency}</TableCell>
+                    <TableCell>{rate}</TableCell>
+                    <TableCell>{converted.toFixed(2)}</TableCell>
+                    <TableCell>BRL</TableCell>
+                    <TableCell>✏️ 🗑️</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
