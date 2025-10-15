@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/app/hooks";
 import { Coins, User } from "lucide-react";
-import Logo from "@/assets/react.svg";
+import Logo from "@/assets/logo.svg";
 
 export const Header = () => {
   const email = useAppSelector((state) => state.auth.email);

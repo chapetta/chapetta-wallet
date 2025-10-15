@@ -17,8 +17,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { fetchCurrencies } from "@/features/wallet/walletSlice";
 
 export const Wallet = () => {
+  const dispatch = useAppDispatch();
+  const { currencies, loading } = useAppSelector((state) => state.wallet);
+
+  useEffect(() => {
+    dispatch(fetchCurrencies());
+  }, [dispatch]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-400 to-blue-600">
       <Header />
@@ -83,10 +93,11 @@ export const Wallet = () => {
                       <SelectValue placeholder="Selecionar moeda" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="usd">USD</SelectItem>
-                      <SelectItem value="eur">EUR</SelectItem>
-                      <SelectItem value="brl">BRL</SelectItem>
-                      <SelectItem value="ars">ARS</SelectItem>
+                      {currencies.map((curr) => (
+                        <SelectItem key={curr} value={curr}>
+                          {curr}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
