@@ -1,3 +1,9 @@
+import { Header } from "@/components/layout/Header";
+
 export const Wallet = () => {
-  return <div>Wallet</div>;
+  return (
+    <>
+      <Header />
+    </>
+  );
 };
