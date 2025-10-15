@@ -12,7 +12,7 @@ export const Header = () => {
         <div className="flex items-center gap-2">
           <img src={Logo} alt="Chaps Wallet Logo" className="w-8 h-8" />
           <h1 className="text-2xl font-semibold text-blue-600">
-            Trybe<span className="text-emerald-500">Wallet</span>
+            Chaps<span className="text-emerald-500">Wallet</span>
           </h1>
         </div>
 
