@@ -19,6 +19,7 @@ type WalletStore = {
   addExpense: (expense: Omit<Expense, "id" | "exchangeRates">) => Promise<void>;
   totalExpenses: number;
   getTotalExpenses: () => void;
+  deleteExpense: (id: number) => void;
 };
 
 const useExpensesStore = create<WalletStore>()(
@@ -70,6 +71,12 @@ const useExpensesStore = create<WalletStore>()(
         }, 0);
 
         set({ totalExpenses: total });
+      },
+      deleteExpense: (id) => {
+        const newArray = get().expenses.filter((expense) => expense.id !== id);
+
+        set({ expenses: newArray });
+        get().getTotalExpenses();
       },
     }),
     {

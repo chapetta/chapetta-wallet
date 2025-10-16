@@ -27,6 +27,7 @@ export const Wallet = () => {
     expenses,
     addExpense,
     getTotalExpenses,
+    deleteExpense,
   } = useExpensesStore((state) => state);
 
   const [form, setForm] = useState({
@@ -58,6 +59,10 @@ export const Wallet = () => {
 
     getTotalExpenses();
   };
+
+  useEffect(() => {
+    getTotalExpenses();
+  }, [expenses]);
 
   useEffect(() => {
     fetchCurrencies();
@@ -206,7 +211,15 @@ export const Wallet = () => {
                     <TableCell>{rate.toFixed(2)}</TableCell>
                     <TableCell>{converted.toFixed(2)}</TableCell>
                     <TableCell>BRL</TableCell>
-                    <TableCell>✏️ 🗑️</TableCell>
+                    <TableCell>
+                      ✏️{" "}
+                      <button
+                        className="cursor-pointer"
+                        onClick={() => deleteExpense(exp.id)}
+                      >
+                        🗑️
+                      </button>
+                    </TableCell>
                   </TableRow>
                 );
               })}
