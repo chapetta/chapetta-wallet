@@ -1,9 +1,9 @@
-import { useAppSelector } from "@/app/hooks";
 import { Coins, User } from "lucide-react";
 import Logo from "@/assets/logo.svg";
+import { useAuthStore } from "@/stores/AuthStore";
 
 export const Header = () => {
-  const email = useAppSelector((state) => state.auth.email);
+  const { email } = useAuthStore((state) => state);
   const totalDespesas = 320.98;
 
   return (

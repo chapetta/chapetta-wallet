@@ -18,14 +18,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { addExpense, fetchCurrencies } from "@/features/wallet/walletSlice";
+import useExpensesStore from "@/stores/WalletStore";
 
 export const Wallet = () => {
-  const dispatch = useAppDispatch();
-  const { currencies, loading, expenses } = useAppSelector(
-    (state) => state.wallet
-  );
+  const { currencies, fetchCurrencies, expenses, addExpense } =
+    useExpensesStore((state) => state);
 
   const [form, setForm] = useState({
     value: "",
@@ -46,7 +43,7 @@ export const Wallet = () => {
 
     if (!form.value || !form.description || !form.currency) return;
 
-    dispatch(addExpense(form));
+    addExpense(form);
 
     setForm({
       ...form,
@@ -56,8 +53,8 @@ export const Wallet = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchCurrencies());
-  }, [dispatch]);
+    fetchCurrencies();
+  }, [fetchCurrencies]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-400 to-blue-600">

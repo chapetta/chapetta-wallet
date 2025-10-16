@@ -18,9 +18,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/app/store";
-import { setEmail } from "@/features/authslice/authSlice";
+import { useAuthStore } from "@/stores/AuthStore";
 
 const loginSchema = z.object({
   email: z.email({ message: "E-mail inválido" }),
@@ -39,14 +37,14 @@ export const Login = () => {
     mode: "onChange",
   });
 
-  const onSubmit = (data: LoginData) => {
-    dispatch(setEmail(data.email));
+  const { setEmail } = useAuthStore((state) => state);
 
+  const onSubmit = (data: LoginData) => {
+    setEmail(data.email);
     navigate("/wallet");
   };
 
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
 
   return (
     <div className="h-screen flex items-center justify-center bg-emerald-500 ">
