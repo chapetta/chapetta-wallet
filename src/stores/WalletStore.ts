@@ -8,7 +8,7 @@ type Expense = {
   currency: string;
   method: string;
   tag: string;
-  exchangeRates: Record<string, string>;
+  exchangeRates: Record<string, any>;
 };
 
 type WalletStore = {
@@ -17,6 +17,8 @@ type WalletStore = {
   fetchCurrencies: () => Promise<void>;
   error: string | null;
   addExpense: (expense: Omit<Expense, "id" | "exchangeRates">) => Promise<void>;
+  totalExpenses: number;
+  getTotalExpenses: () => void;
 };
 
 const useExpensesStore = create<WalletStore>()(
@@ -25,6 +27,7 @@ const useExpensesStore = create<WalletStore>()(
       expenses: [],
       currencies: [],
       error: null,
+      totalExpenses: 0,
       fetchCurrencies: async () => {
         try {
           const response = await fetch(
@@ -36,6 +39,7 @@ const useExpensesStore = create<WalletStore>()(
           );
           set({ currencies, error: null });
         } catch (e) {
+          console.log(e);
           set({ error: "Erro ao carregar as moedas" });
         }
       },
@@ -55,6 +59,17 @@ const useExpensesStore = create<WalletStore>()(
         } catch (error) {
           console.log("Error ao adicionar despesa", error);
         }
+      },
+      getTotalExpenses: () => {
+        const expenses = get().expenses;
+
+        const total = expenses.reduce((acc, exp) => {
+          const rate = Number(exp.exchangeRates[exp.currency].ask);
+          const converted = Number(exp.value) * rate;
+          return acc + converted;
+        }, 0);
+
+        set({ totalExpenses: total });
       },
     }),
     {

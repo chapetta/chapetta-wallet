@@ -1,10 +1,12 @@
 import { Coins, User } from "lucide-react";
 import Logo from "@/assets/logo.svg";
 import { useAuthStore } from "@/stores/AuthStore";
+import useExpensesStore from "@/stores/WalletStore";
 
 export const Header = () => {
   const { email } = useAuthStore((state) => state);
-  const totalDespesas = 320.98;
+  const { totalExpenses } = useExpensesStore((state) => state);
+  const totalDespesas = totalExpenses;
 
   return (
     <header className="w-full bg-white border-b shadow-sm">

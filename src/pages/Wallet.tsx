@@ -21,8 +21,13 @@ import { useEffect, useState } from "react";
 import useExpensesStore from "@/stores/WalletStore";
 
 export const Wallet = () => {
-  const { currencies, fetchCurrencies, expenses, addExpense } =
-    useExpensesStore((state) => state);
+  const {
+    currencies,
+    fetchCurrencies,
+    expenses,
+    addExpense,
+    getTotalExpenses,
+  } = useExpensesStore((state) => state);
 
   const [form, setForm] = useState({
     value: "",
@@ -50,6 +55,8 @@ export const Wallet = () => {
       value: "",
       description: "",
     });
+
+    getTotalExpenses();
   };
 
   useEffect(() => {
@@ -196,7 +203,7 @@ export const Wallet = () => {
                     <TableCell>{exp.method}</TableCell>
                     <TableCell>{Number(exp.value).toFixed(2)}</TableCell>
                     <TableCell>{exp.currency}</TableCell>
-                    <TableCell>{rate}</TableCell>
+                    <TableCell>{rate.toFixed(2)}</TableCell>
                     <TableCell>{converted.toFixed(2)}</TableCell>
                     <TableCell>BRL</TableCell>
                     <TableCell>✏️ 🗑️</TableCell>
