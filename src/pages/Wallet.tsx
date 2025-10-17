@@ -171,7 +171,7 @@ export const Wallet = () => {
 
                 <Button
                   type="submit"
-                  className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-semibold mt-4 md:mt-6"
+                  className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-semibold mt-4 md:mt-6 cursor-pointer"
                 >
                   Adicionar despesa
                 </Button>
@@ -182,19 +182,29 @@ export const Wallet = () => {
 
         <div className="bg-blue-700 text-white rounded-lg shadow-lg p-4">
           <Table>
-            <TableHeader>
+            <TableHeader className="text-center">
               <TableRow>
-                <TableHead className="text-white">Descrição</TableHead>
-                <TableHead className="text-white">Tag</TableHead>
-                <TableHead className="text-white">
+                <TableHead className="text-white text-center">
+                  Descrição
+                </TableHead>
+                <TableHead className="text-white text-center">Tag</TableHead>
+                <TableHead className="text-white text-center">
                   Método de pagamento
                 </TableHead>
-                <TableHead className="text-white">Valor</TableHead>
-                <TableHead className="text-white">Moeda</TableHead>
-                <TableHead className="text-white">Câmbio utilizado</TableHead>
-                <TableHead className="text-white">Valor convertido</TableHead>
-                <TableHead className="text-white">Moeda de conversão</TableHead>
-                <TableHead className="text-white">Editar/Excluir</TableHead>
+                <TableHead className="text-white text-center">Valor</TableHead>
+                <TableHead className="text-white text-center">Moeda</TableHead>
+                <TableHead className="text-white text-center">
+                  Câmbio utilizado
+                </TableHead>
+                <TableHead className="text-white text-center">
+                  Valor convertido
+                </TableHead>
+                <TableHead className="text-white text-center">
+                  Moeda de conversão
+                </TableHead>
+                <TableHead className="text-white text-center">
+                  Excluir
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -202,7 +212,7 @@ export const Wallet = () => {
                 const rate = Number(exp.exchangeRates[exp.currency].ask);
                 const converted = Number(exp.value) * rate;
                 return (
-                  <TableRow className="hover:bg-blue-800/60 transition">
+                  <TableRow className="hover:bg-blue-800/60 transition text-center">
                     <TableCell>{exp.description}</TableCell>
                     <TableCell>{exp.tag}</TableCell>
                     <TableCell>{exp.method}</TableCell>
@@ -211,8 +221,7 @@ export const Wallet = () => {
                     <TableCell>{rate.toFixed(2)}</TableCell>
                     <TableCell>{converted.toFixed(2)}</TableCell>
                     <TableCell>BRL</TableCell>
-                    <TableCell>
-                      ✏️{" "}
+                    <TableCell className="text-center">
                       <button
                         className="cursor-pointer"
                         onClick={() => deleteExpense(exp.id)}
