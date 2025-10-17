@@ -1,12 +1,14 @@
-import { Coins, User } from "lucide-react";
+import { Coins, LogOut, User } from "lucide-react";
 import Logo from "@/assets/logo.svg";
 import { useAuthStore } from "@/stores/AuthStore";
 import useExpensesStore from "@/stores/WalletStore";
+import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const { email } = useAuthStore((state) => state);
   const { totalExpenses } = useExpensesStore((state) => state);
   const totalDespesas = totalExpenses;
+  const navigate = useNavigate();
 
   return (
     <header className="w-full bg-white border-b shadow-sm">
@@ -22,7 +24,12 @@ export const Header = () => {
           <Coins className="text-blue-600 w-5 h-5" />
           <span className="text-blue-600 font-semibold">
             Total de despesas:{" "}
-            <span className="font-bold">{totalDespesas.toFixed(2)} BRL</span>
+            <span className="font-bold">
+              {new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(totalDespesas)}{" "}
+            </span>
           </span>
         </div>
 
@@ -33,6 +40,11 @@ export const Header = () => {
           <span className="text-emerald-600 font-medium">
             {email || "email@email.com"}
           </span>
+        </div>
+        <div className="flex gap-2 text-emerald-600 cursor-pointer hover:text-emerald-800">
+          <button onClick={() => navigate("/")}>
+            <LogOut /> Sair
+          </button>
         </div>
       </div>
     </header>

@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 type AuthStore = {
   email: string;
   setEmail: (value: string) => void;
+  logOut: () => void;
 };
 
 export const useAuthStore = create<AuthStore>()(
@@ -11,6 +12,10 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       email: "",
       setEmail: (email: string) => set({ email }),
+      logOut: () => {
+        set({ email: "" });
+        localStorage.removeItem("wallet-storage");
+      },
     }),
     { name: "auth-storage" }
   )

@@ -17,8 +17,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useExpensesStore from "@/stores/WalletStore";
+import { Trash2Icon } from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// ✅ Schema de validação
+const expenseSchema = z.object({
+  value: z
+    .string()
+    .min(1, "O valor é obrigatório")
+    .refine((v) => parseFloat(v) > 0, "O valor deve ser maior que 0"),
+  description: z.string().min(1, "A descrição é obrigatória"),
+  currency: z.string().min(1, "Selecione uma moeda"),
+  tag: z.string().min(1, "Selecione uma categoria"),
+  method: z.string().min(1, "Selecione um método de pagamento"),
+});
+
+type ExpenseFormData = z.infer<typeof expenseSchema>;
 
 export const Wallet = () => {
   const {
@@ -30,33 +48,32 @@ export const Wallet = () => {
     deleteExpense,
   } = useExpensesStore((state) => state);
 
-  const [form, setForm] = useState({
-    value: "",
-    description: "",
-    currency: "",
-    tag: "Alimentação",
-    method: "Dinheiro",
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!form.value || !form.description || !form.currency) return;
-
-    addExpense(form);
-
-    setForm({
-      ...form,
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<ExpenseFormData>({
+    resolver: zodResolver(expenseSchema),
+    defaultValues: {
       value: "",
       description: "",
-    });
+      currency: "",
+      tag: "Alimentação",
+      method: "Dinheiro",
+    },
+  });
 
+  const onSubmit = (data: ExpenseFormData) => {
+    addExpense(data);
+    reset({
+      value: "",
+      description: "",
+      currency: "",
+      tag: "Alimentação",
+      method: "Dinheiro",
+    });
     getTotalExpenses();
   };
 
@@ -75,29 +92,42 @@ export const Wallet = () => {
       <main className="max-w-6xl mx-auto px-6 mt-8 flex flex-col gap-10">
         <Card className="bg-white shadow-xl rounded-lg">
           <CardContent className="p-6">
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Descrição */}
                 <div>
                   <label className="text-sm font-medium">
                     Descrição da despesa
                   </label>
                   <Input
                     placeholder="Ex: Restaurante"
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
+                    {...register("description")}
+                    className={
+                      errors.description ? "animate-shake border-red-500" : ""
+                    }
                   />
+                  {errors.description && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
+
+                {/* Categoria */}
                 <div>
-                  <label className="text-sm font-medium">
-                    Categoria da despesa
-                  </label>
+                  <label className="text-sm font-medium">Categoria</label>
                   <Select
-                    name="tag"
-                    value={form.tag}
-                    onValueChange={(value) => setForm({ ...form, tag: value })}
+                    onValueChange={(value) => setValue("tag", value)}
+                    defaultValue="Alimentação"
                   >
-                    <SelectTrigger>
+                    <SelectTrigger
+                      className={
+                        errors.tag ? "animate-shake border-red-500" : ""
+                      }
+                    >
                       <SelectValue placeholder="Selecionar categoria" />
                     </SelectTrigger>
                     <SelectContent>
@@ -108,55 +138,79 @@ export const Wallet = () => {
                       <SelectItem value="Saúde">Saúde</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.tag && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.tag.message}
+                    </p>
+                  )}
                 </div>
+
+                {/* Valor */}
                 <div>
                   <label className="text-sm font-medium">Valor</label>
                   <Input
                     type="number"
-                    name="value"
+                    step="0.01"
                     placeholder="0.00"
-                    value={form.value}
-                    onChange={handleChange}
+                    {...register("value")}
+                    className={
+                      errors.value ? "animate-shake border-red-500" : ""
+                    }
                   />
+                  {errors.value && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.value.message}
+                    </p>
+                  )}
                 </div>
+
+                {/* Método */}
                 <div>
                   <label className="text-sm font-medium">
                     Método de pagamento
                   </label>
                   <Select
-                    name="method"
-                    value={form.method}
-                    onValueChange={(value) =>
-                      setForm({ ...form, method: value })
-                    }
+                    onValueChange={(value) => setValue("method", value)}
+                    defaultValue="Dinheiro"
                   >
-                    <SelectTrigger>
+                    <SelectTrigger
+                      className={
+                        errors.method ? "animate-shake border-red-500" : ""
+                      }
+                    >
                       <SelectValue placeholder="Selecionar método" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                      <SelectItem value="cartao-credito">
+                      <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                      <SelectItem value="Cartão de Crédito">
                         Cartão de Crédito
                       </SelectItem>
-                      <SelectItem value="cartao-debito">
+                      <SelectItem value="Cartão de Débito">
                         Cartão de Débito
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.method && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.method.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
+              {/* Moeda */}
               <div className="flex flex-col md:flex-row items-center gap-4">
                 <div className="w-full md:w-1/3">
                   <label className="text-sm font-medium">Moeda</label>
                   <Select
-                    name="currency"
-                    value={form.currency}
-                    onValueChange={(value) =>
-                      setForm({ ...form, currency: value })
-                    }
+                    onValueChange={(value) => setValue("currency", value)}
+                    defaultValue=""
                   >
-                    <SelectTrigger>
+                    <SelectTrigger
+                      className={
+                        errors.currency ? "animate-shake border-red-500" : ""
+                      }
+                    >
                       <SelectValue placeholder="Selecionar moeda" />
                     </SelectTrigger>
                     <SelectContent>
@@ -167,11 +221,16 @@ export const Wallet = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.currency && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.currency.message}
+                    </p>
+                  )}
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-semibold mt-4 md:mt-6 cursor-pointer"
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold mt-4 md:mt-6"
                 >
                   Adicionar despesa
                 </Button>
@@ -180,6 +239,7 @@ export const Wallet = () => {
           </CardContent>
         </Card>
 
+        {/* Tabela */}
         <div className="bg-blue-700 text-white rounded-lg shadow-lg p-4">
           <Table>
             <TableHeader className="text-center">
@@ -188,20 +248,14 @@ export const Wallet = () => {
                   Descrição
                 </TableHead>
                 <TableHead className="text-white text-center">Tag</TableHead>
-                <TableHead className="text-white text-center">
-                  Método de pagamento
-                </TableHead>
+                <TableHead className="text-white text-center">Método</TableHead>
                 <TableHead className="text-white text-center">Valor</TableHead>
                 <TableHead className="text-white text-center">Moeda</TableHead>
+                <TableHead className="text-white text-center">Câmbio</TableHead>
                 <TableHead className="text-white text-center">
-                  Câmbio utilizado
+                  Convertido
                 </TableHead>
-                <TableHead className="text-white text-center">
-                  Valor convertido
-                </TableHead>
-                <TableHead className="text-white text-center">
-                  Moeda de conversão
-                </TableHead>
+                <TableHead className="text-white text-center">BRL</TableHead>
                 <TableHead className="text-white text-center">
                   Excluir
                 </TableHead>
@@ -212,22 +266,31 @@ export const Wallet = () => {
                 const rate = Number(exp.exchangeRates[exp.currency].ask);
                 const converted = Number(exp.value) * rate;
                 return (
-                  <TableRow className="hover:bg-blue-800/60 transition text-center">
+                  <TableRow
+                    key={exp.id}
+                    className="hover:bg-blue-800/60 transition text-center"
+                  >
                     <TableCell>{exp.description}</TableCell>
                     <TableCell>{exp.tag}</TableCell>
                     <TableCell>{exp.method}</TableCell>
                     <TableCell>{Number(exp.value).toFixed(2)}</TableCell>
                     <TableCell>{exp.currency}</TableCell>
                     <TableCell>{rate.toFixed(2)}</TableCell>
-                    <TableCell>{converted.toFixed(2)}</TableCell>
+                    <TableCell>
+                      {new Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(converted)}
+                    </TableCell>
                     <TableCell>BRL</TableCell>
                     <TableCell className="text-center">
-                      <button
-                        className="cursor-pointer"
+                      <Button
+                        variant="ghost"
+                        className="cursor-pointer hover:bg-red-600"
                         onClick={() => deleteExpense(exp.id)}
                       >
-                        🗑️
-                      </button>
+                        <Trash2Icon />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
