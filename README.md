@@ -1,73 +1,156 @@
-# React + TypeScript + Vite
+# 💸 ChapsWallet – React + TypeScript + Zustand + Tailwind + Shadcn/UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este projeto é uma aplicação **ChapsWallet** desenvolvida com **React**, **TypeScript**, **Zustand** **Tailwind CSS**, **Shadcn/UI** e **Zod**, criada para praticar conceitos de **validação de formulários**, **componentização**, **estilização responsiva** e além de **consumo de API de câmbio** em tempo real..
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+🌐 [Preview do Projeto](https://chaps-wallet.vercel.app/)
 
-## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+## 💻 Preview Desktop
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+<img src="public/images/web_preview.gif" alt="Preview desktop" width="800px" />
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Tecnologias Utilizadas
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **React + Vite** — Estrutura do projeto, componentização e reatividade.
+- **TypeScript** — Tipagem estática e segurança no desenvolvimento.
+- **Tailwind CSS** — Estilização utilitária, responsiva e produtiva.
+- **Zustand** — Gerenciamento de estado global simples e performático (com persist)
+- **Shadcn/UI** — Componentes acessíveis e customizáveis.
+- **Zod + React Hook Form** — Validação de formulários e UX consistente.
+- **Lucide Icons** — Ícones leves e escaláveis.
+
+---
+
+## Estrutura do Projeto
+
+```plaintext
+chaps-wallet/
+├─ src/
+│  ├─ assets/
+│  │  └─ logo.svg
+│  ├─ components/
+│  │  ├─ layout/
+│  │  │  └─ Header.tsx
+│  │  └─ ui/            (componentes do Shadcn)
+│  ├─ pages/
+│  │  ├─ Login.tsx
+│  │  └─ Wallet.tsx
+│  ├─ stores/
+│  │  ├─ AuthStore.ts
+│  │  └─ WalletStore.ts
+│  ├─ routes/
+│  │  └─ index.tsx
+│  ├─ styles/
+│  │  └─ global.css
+│  ├─ App.tsx
+│  └─ main.tsx
+└─ package.json
+``` 
+
+---
+
+## ⚙️ Funcionalidades
+
+- [x] **Login com validação** usando Zod + React Hook Form
+- [x] **Listagem de despesas** com conversão automática para BRL
+- [x] **Adição de despesas** (valor, descrição, moeda, método, categoria)
+- [x] **Exclusão de despesas** com atualização imediata do total
+- [x] **Cálculo do total** convertido (via ask) exibido no Header
+- [x] **Requisição de moedas** via API https://economia.awesomeapi.com.br/json/all
+- [x] **Persistência** do estado com zustand/persist
+- [x] **Responsivo** — Layout adaptável para desktop e mobile
+
+---
+
+## 🎨 Estilização
+
+O projeto utiliza **Tailwind CSS** e **Shadcn/UI** com foco em::
+
+- **Paleta moderna** (verde principal e roxos/azuis de apoio)
+- **Cards** com sombras suaves e espaçamentos consistentes
+- **Feedback visual** (erros em vermelho, animação leve no campo inválido)
+- **Acessibilidade** nos componentes interativos (focus/hover ativos)
+
+---
+
+## 🧩 Componentes Principais
+
+- **Header** — Exibe o e-mail do usuário logado e o total de despesas (BRL).
+- **Login** — Formulário validado com Zod (e-mail/senha) e navegação para a Wallet.
+- **Wallet** — Formulário de despesas + tabela com conversão e ações.
+- **Tabela de Despesas** — Mostra descrição, moeda, câmbio utilizado, valor convertido e ações.
+
+---
+
+## 🧠 Estado Global – `Zustand`
+
+Gerencia toda a lógica principal::
+
+- `fetchCurrencies` → Carrega moedas a partir da API.
+- `addExpense` → Adiciona a despesa e guarda o exchangeRates do momento.
+- `deleteExpense` → Remove uma despesa pelo id.
+- `getTotalExpenses` → Recalcula o total somando value * ask para cada item.
+
+---
+
+## 📥 Clone o repositório
+
+```bash
+git clone https://github.com/chapetta/chaps-wallet.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+📂 Acesse a pasta do projeto
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd chaps-wallet
 ```
+⚙️ Instale as dependências
+
+```bash
+npm install
+```
+# ou
+```
+yarn install
+```
+
+
+▶️ Rode o projeto
+
+``` bash
+npm run dev
+``` 
+# ou
+```
+yarn dev
+``` 
+
+
+🎯 Objetivo do Projeto
+
+Este projeto foi criado com foco em aprendizado prático de:
+
+    React com TypeScript
+    Gerenciamento de estado global com Zustand
+    Validação de formulários com Zod + RHF
+    Estilização moderna com Tailwind CSS e Shadcn/UI
+    Consumo de API e manipulação de dados (cotações em tempo real)e
+
+📜 Licença
+
+Este projeto é de uso livre para fins de estudo. Sinta-se à vontade para contribuir ou sugerir melhorias!
+📬 Contato
+
+
+    
+## 📫 Contato
+
+
+- Email: **cha.petta@hotmail.com**
+- LinkedIn: **https://www.linkedin.com/in/yan-chapetta**
